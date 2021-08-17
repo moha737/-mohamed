@@ -1,0 +1,124 @@
+$json = json_decode(file_get_contents("rolet.json"),true);
+$ro_id = $json[$chat_id]["id"];
+$ro_user = $json[$chat_id]["user"];
+$count = count($json[$chat_id]["id"]);
+$start = $json[$chat_id]["start"];
+$arr = array_rand($ro_user, 1);
+$win = $ro_user[$arr];
+
+if ($text == '/start') {
+    bot('sendMessage', [
+        'chat_id' => $chat_id,
+        'text' => "اهلاََ بكْ 🤾🏻‍♂ [$name](https://telegram.me/$username) 
+        
+        في لعبة الروليت         
+        يمكنك اللعب مع اصدقائك 
+بمجرد ارسال كلمه *روليت*
+        
+        [لمزيد من البوتات اضغط 🥇](https://telegram.me/cqcqq)",
+        'parse_mode'=>"markdown",
+        'disable_web_page_preview'=>true,
+        'reply_markup' => json_encode([
+            'inline_keyboard' => [
+                
+                [['text' => 'تابعنا 🎗️', 'url' => 'https://t.me/cqcqq ']], [['text'=>"مطور البوت 🤽🏿",'callback_data'=>"dev"]],
+            
+    ]])
+    ]);
+}
+if($data == "dev"){
+bot('answerCallbackQuery',[
+    'callback_query_id'=>$update->callback_query->id,
+   'text'=>"Roulette 🤹🏻‍♂. 
+create By : @hhmhhh  :) 
+   My channels : @cqcqq, 
+   - My Team is php_aba ;)
+   فريق العمل : BLACK PHP TeaM ", 
+ 'show_alert'=>true,
+]);
+}
+
+if($text == 'روليت'){
+$json[$chat_id]["start"] = "on" ;
+file_put_contents("rolet.json",json_encode($json));
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"* حسنا قم بارسال { مشاركه } لتنظم الى اللعبه* 🏌🏻‍♂ √",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+}
+if($text == 'مشاركه' and !in_array($from_id ,$ro_id) and $json[$chat_id]["start"] == "on"){
+$json[$chat_id]["id"][] = "$from_id" ;
+$json[$chat_id]["user"][] = "$username" ;
+file_put_contents("rolet.json",json_encode($json));
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"*- قمت بالاشتراك في اللعبه * 🤽🏿 √",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+}elseif($text == 'مشاركه' and in_array($from_id ,$ro_id)){
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"*قمت بالمشاركه بالفعل
+انتظر حتى تبدأ اللعبه * 🤾🏻‍♂√",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+}
+
+if($text == 'المشاركين'){
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"*عدد المشاركين هو : $count * 🤹🏻‍♂ √",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+}
+
+if($text == 'بدء' and $ro_id != null and $start != null and $count >= 2){
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"*جاري تصنيف الفائز 🥇 √*",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+sleep(4);
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>"* الفائز هو 🎖:* [@$win] √",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+$json[$chat_id]["start"] = "off" ;
+unset($json[$chat_id]["id"]);
+unset($json[$chat_id]["user"]);
+file_put_contents("rolet.json",json_encode($json));
+}elseif($text == 'بدء' and $start == "off"){
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>" *انتهت اللعبه ارسل روليت 🤾🏻‍♂*√",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+}elseif($text == "بدء" and $count < 2){
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>" *لم يكتمل العدد المطلوب لبدأ اللعبه 🤾🏻‍♂*√",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+} 
+if($text == 'انهاء اللعبه' and $start == "on"){
+bot('sendmessage',[
+'chat_id'=>$chat_id,
+'text'=>" * تم انهاء اللعبه ارسل روليت للعب مره اخرى 🤾🏻‍♂*√",
+'parse_mode' =>"markdown",
+'reply_to_message_id'=>$message->message_id, 
+]);
+unset($json[$chat_id]["id"]);
+unset($json[$chat_id]["user"]);
+unset($json[$chat_id]["start"]);
+file_put_contents("rolet.json",json_encode($json));
+}
